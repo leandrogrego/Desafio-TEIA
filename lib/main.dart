@@ -279,33 +279,33 @@ class _APIScreenState extends State<APIScreen> with SingleTickerProviderStateMix
   }
 
   Future<dynamic> fetchData(String route, [String? method]) async {
-  late http.Response response;
-  route = "https://jsonplaceholder.typicode.com$route";
-  if (method != null) {
-    switch (method.toUpperCase()) {
-      case 'GET':
-        response = await http.get(Uri.parse(route));
-        break;
-      case 'POST':
-        response = await http.post(Uri.parse(route));
-        break;
-      case 'PUT':
-        response = await http.put(Uri.parse(route));
-        break;
-      case 'PATCH':
-        response = await http.patch(Uri.parse(route));
-        break;
-      case 'DELETE':
-        response = await http.delete(Uri.parse(route));
-        break;
-      default:
-        throw Exception('Unsupported HTTP method: $method');
+    late http.Response response;
+    route = "https://jsonplaceholder.typicode.com$route";
+    if (method != null) {
+      switch (method.toUpperCase()) {
+        case 'GET':
+          response = await http.get(Uri.parse(route));
+          break;
+        case 'POST':
+          response = await http.post(Uri.parse(route));
+          break;
+        case 'PUT':
+          response = await http.put(Uri.parse(route));
+          break;
+        case 'PATCH':
+          response = await http.patch(Uri.parse(route));
+          break;
+        case 'DELETE':
+          response = await http.delete(Uri.parse(route));
+          break;
+        default:
+          throw Exception('Unsupported HTTP method: $method');
+      }
+    } else {
+      response = await http.get(Uri.parse(route));
     }
-  } else {
-    response = await http.get(Uri.parse(route));
-  }
-  
-  if (response.statusCode == 200) {
+    
+    if (response.statusCode == 200) {
       final jsonResponse = jsonDecode(response.body);
       return jsonResponse is List ? jsonResponse : [jsonResponse];
     } else {
@@ -335,31 +335,31 @@ class _APIScreenState extends State<APIScreen> with SingleTickerProviderStateMix
       body: TabBarView(
         controller: _tabController,
         children: [
-          _TabContent(route: '/posts', method: 'GET', fetchData: fetchData),
-          _TabContent(route: '/posts/1', method: 'GET', fetchData: fetchData),
-          _TabContent(route: '/posts/1/comments', method: 'GET', fetchData: fetchData),
-          _TabContent(route: '/posts', method: 'POST', fetchData: fetchData),
-          _TabContent(route: '/posts/1', method: 'PUT', fetchData: fetchData),
-          _TabContent(route: '/posts/1', method: 'PATCH', fetchData: fetchData),
-          _TabContent(route: '/posts/1', method: 'DELETE', fetchData: fetchData),
+          TabContent(route: '/posts', method: 'GET', fetchData: fetchData),
+          TabContent(route: '/posts/1', method: 'GET', fetchData: fetchData),
+          TabContent(route: '/posts/1/comments', method: 'GET', fetchData: fetchData),
+          TabContent(route: '/posts', method: 'POST', fetchData: fetchData),
+          TabContent(route: '/posts/1', method: 'PUT', fetchData: fetchData),
+          TabContent(route: '/posts/1', method: 'PATCH', fetchData: fetchData),
+          TabContent(route: '/posts/1', method: 'DELETE', fetchData: fetchData),
         ],
       ),
     );
   }
 }
 
-class _TabContent extends StatefulWidget {
+class TabContent extends StatefulWidget {
   final String route;
   final String? method;
   final Future<dynamic> Function(String) fetchData;
 
-  const _TabContent({Key? key, required this.route, this.method, required this.fetchData}) : super(key: key);
+  const TabContent({Key? key, required this.route, this.method, required this.fetchData}) : super(key: key);
 
   @override
-  __TabContentState createState() => __TabContentState();
+  _TabContentState createState() => _TabContentState();
 }
 
-class __TabContentState extends State<_TabContent> {
+class _TabContentState extends State<TabContent> {
   late Future<dynamic> _futureData;
 
   @override
@@ -391,9 +391,31 @@ class __TabContentState extends State<_TabContent> {
       itemCount: data.length,
       itemBuilder: (context, index) {
         final item = data[index];
-        return ListTile(
-          title: Text(item['title'] ?? ''),
-          subtitle: Text(item['body'] ?? ''),
+        return Card(
+          elevation: 3, // Adiciona sombra ao card
+          margin: const EdgeInsets.symmetric(vertical: 8, horizontal: 16), // Define margens
+          child: Padding(
+            padding: const EdgeInsets.all(16),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  item['title'] ?? '',
+                  style: const TextStyle(
+                    fontSize: 18,
+                    fontWeight: FontWeight.bold,
+                  ),
+                ),
+                const SizedBox(height: 8),
+                Text(
+                  item['body'] ?? '',
+                  style: const TextStyle(
+                    fontSize: 16,
+                  ),
+                ),
+              ],
+            ),
+          ),
         );
       },
     );
@@ -548,11 +570,21 @@ class _SavedDataScreenState extends State<SavedDataScreen> {
                 itemCount: data.length,
                 itemBuilder: (context, index) {
                   final item = data[index];
-                  return ListTile(
-                    leading: item['foto'] != null
-                      ? Image.memory(base64Decode(item['foto']!)) // Exibindo a foto se não for nula
-                      : const Icon(Icons.error), // Ícone de erro se for nulatitle: Text('Apelido: ${item['apelido']}, PAT: ${item['pat']}'),
-                    title: Text('Apelido: ${item['apelido']}, PAT: ${item['pat']}'),
+                  return Card(
+                    margin: const EdgeInsets.symmetric(vertical: 5, horizontal: 10),
+                    child: ListTile(
+                      leading: item['foto'] != null
+                        ? Image.memory(base64Decode(item['foto']!)) // Exibindo a foto se não for nula
+                        : const Icon(Icons.error), // Ícone de erro se for nula
+                      title: Text(
+                        'Apelido: ${item['apelido']}',
+                        style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                      ),
+                      subtitle: Text(
+                        'PAT: ${item['pat']}',
+                        style: const TextStyle(fontSize: 14),
+                      ),
+                    ),
                   );
                 },
               );

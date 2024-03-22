@@ -6,6 +6,11 @@ de proficiéncia que participante detém na tecnologia mobile que mais domina. O
 delimitado e pelo nivel de qualidade atingido.  
 Ele inclui diversas funcionalidades como captura de fotos, validação de dados de entrada, salvamento de dados localmente e acesso a uma API externa.
 
+Demo Android
+--------------------
+![QR Code](./README.md)
+[Baixar APK](./DEMO/Android/Desafio-TEIA.apk)
+
 Estrutura do Projeto
 --------------------
 
