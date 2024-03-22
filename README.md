@@ -8,8 +8,10 @@ Ele inclui diversas funcionalidades como captura de fotos, validação de dados 
 
 Demo Android
 --------------------
-![QR Code](./README.md)
-[Baixar APK](./DEMO/Android/Desafio-TEIA.apk)
+
+[![QR Code](./raw/main/DEMO/qrcode.jpg)](./blob/main/README.md)
+
+[Baixar APK](./raw/main/DEMO/Android/Desafio-TEIA.apk)
 
 Estrutura do Projeto
 --------------------
