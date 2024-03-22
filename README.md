@@ -13,7 +13,6 @@ O projeto está organizado da seguinte forma:
 
 *   **`lib/`**: Contém o código-fonte do aplicativo Flutter.
     *   **`main.dart`**: Arquivo principal do aplicativo, onde a execução começa e estão as funções codificadas.
-    escrita de arquivos.
 *   **`android/`** e **`ios/`**: Contêm arquivos específicos da plataforma para a construção do aplicativo nativo.
 *   **`pubspec.yaml`**: Arquivo de manifesto do Flutter que lista as dependências do projeto.
 
