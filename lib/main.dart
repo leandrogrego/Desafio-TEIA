@@ -57,19 +57,48 @@ class HomeScreen extends StatefulWidget {
 }
 
 class _HomeScreenState extends State<HomeScreen> {
-  int _pat = 0; // Valor inicial do PAT
+  int? _pat;  
   File? _imageFile;
 
   @override
   void initState() {
     super.initState();
-    _handleDeepLink();
+    initUniLinks();
   }
 
   @override
   void dispose() {
     _apelidoController.dispose();
     super.dispose();
+  }
+
+  Future<void> initUniLinks() async {
+    String? initialLink;
+    try {
+      initialLink = await getInitialLink(); // Obtém o link inicial se o aplicativo foi aberto a partir de uma URL
+      if (initialLink != null) {
+        processLink(Uri.parse(initialLink)); // Processa o link inicial
+      }
+    } on PlatformException {
+      // Lida com exceções, se houver, ao obter o link inicial
+    }
+
+    linkStream.listen((Uri? uri) {
+      if (uri != null) {
+        processLink(uri); // Processa links recebidos posteriormente
+      }
+    } as void Function(String? event)?, onError: (dynamic err) {
+      // Lida com erros ao receber links
+    });
+  }
+
+  void processLink(Uri uri) {
+    if (uri.scheme == 'caixa.gov.br' && uri.host == 'meupat') { // Verifica se o esquema e o host correspondem
+      final pat = uri.queryParameters['pat']; // Extrai o parâmetro 'pat' da URL
+      setState(() {
+        _pat = int.tryParse(pat!); // Converte 'pat' para int e atribui a _pat
+      });
+    }
   }
 
   void _validateApelido(String value) {
@@ -118,7 +147,7 @@ class _HomeScreenState extends State<HomeScreen> {
             ),
             const SizedBox(height: 10),
             ElevatedButton(
-              onPressed: _isApelidoValid ? () => _salvarDados(_apelidoController.text, _pat) : null,
+              onPressed: _isApelidoValid ? () => _salvarDados(_apelidoController.text, _pat, _imageFile) : null,
               child: const Text('Salvar'),
             ),
             ElevatedButton(
@@ -145,13 +174,13 @@ class _HomeScreenState extends State<HomeScreen> {
     );
   }
 
-  void _salvarDados(apelido, pat) async {
+  void _salvarDados(apelido, pat, imageFile) async {
 
     try {
       final dados = Dados(
         apelido: apelido,
-        pat: _pat,
-        foto: _imageFile != null ? base64Encode(await _imageFile!.readAsBytes()) : null,
+        pat: pat,
+        foto: imageFile != null ? base64Encode(await imageFile!.readAsBytes()) : null,
       );
 
       final file = await _getLocalFile();
@@ -212,30 +241,6 @@ class _HomeScreenState extends State<HomeScreen> {
     final directory = await getApplicationDocumentsDirectory();
     final path = directory.path;
     return File('$path/dados.json');
-  }
-
-  void _handleDeepLink() async {
-    String? initialLink;
-    try {
-      initialLink = await getInitialLink();
-      if (initialLink != null) {
-        _processLink(Uri.parse(initialLink));
-      }
-    } on PlatformException {
-      // Lidar com exceções se houver problemas ao obter o link inicial
-    }
-  }
-
-  void _processLink(Uri link) {
-    if (link.scheme == 'caixa.gov.br' && link.host == 'meupat') {
-      final pat = link.queryParameters['pat'];
-      if (pat != null) {
-        // Atualizar o estado do widget com o PAT recebido
-        setState(() {
-          _pat = int.tryParse(pat) ?? 0; // Converta o PAT para um inteiro
-        });
-      }
-    }
   }
 
   Future<void> _pickImage() async {
@@ -408,20 +413,6 @@ class Post {
       title: json['title'],
       body: json['body'],
     );
-  }
-}
-
-void _showCameraScreen(BuildContext context) async {
-  try {
-    final cameras = await availableCameras();
-    final firstCamera = cameras.first;
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => CameraApp(camera: firstCamera)),
-    );
-  } catch (e) {
-    print('Erro ao acessar a câmera: $e');
-    // Tratar o erro
   }
 }
 
