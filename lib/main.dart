@@ -558,9 +558,10 @@ class _SavedDataScreenState extends State<SavedDataScreen> {
                 itemBuilder: (context, index) {
                   final item = data[index];
                   return ListTile(
-                    leading: Image.memory(base64Decode(item['foto'])), // Exibindo a foto
+                    leading: item['foto'] != null
+                      ? Image.memory(base64Decode(item['foto']!)) // Exibindo a foto se não for nula
+                      : const Icon(Icons.error), // Ícone de erro se for nulatitle: Text('Apelido: ${item['apelido']}, PAT: ${item['pat']}'),
                     title: Text('Apelido: ${item['apelido']}, PAT: ${item['pat']}'),
-
                   );
                 },
               );
